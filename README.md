@@ -108,7 +108,7 @@ You can add or remove satellites by editing the `SatelliteData` structure in the
 
 Para adicionar o esquema ao README, você pode incluir o protótipo do esquemático como uma imagem. Aqui está um trecho atualizado com o esquemático:
 
-## Schematic Prototype
+## Schematic Prototype (unfinished)
 
 Below is the current prototype of the SatTracker circuit, designed to integrate the ESP32, GPS module, OLED display, and other components:
 
