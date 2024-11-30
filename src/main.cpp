@@ -6,16 +6,16 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 
-// Definições do display OLED
+// Configuração do display OLED
 #define SCREEN_WIDTH 128
 #define SCREEN_HEIGHT 32
 #define OLED_RESET -1
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
-// Definições dos botões
+// Pinos dos botões
 #define BUTTON_PIN_NEXT 25
 #define BUTTON_PIN_PREV 26
-#define BUTTON_PIN_SELECT 27  // Botão adicional para selecionar uma opção
+#define BUTTON_PIN_SELECT 27
 
 // Constantes e objetos globais
 Ticker tkSecond;
@@ -25,16 +25,11 @@ Sgp4 sat;
 int timezone = -3;
 int currentSatelliteIndex = 0;
 int currentMenuIndex = 0;
-int topMenuIndex = 0;  // Índice do item superior visível no menu
-
-// Variáveis de tempo
+int topMenuIndex = 0;
 int year, mon, day, hr, minute;
 double sec;
+time_t unixtime;
 
-time_t unixtime; // Tempo UNIX global
-
-
-// Estrutura para armazenar dados TLE de vários satélites
 struct SatelliteData {
     char name[20];
     char tle_line1[70];
@@ -55,9 +50,9 @@ SatelliteData satellites[] = {
 };
 
 const int numSatellites = sizeof(satellites) / sizeof(SatelliteData);
-const int maxVisibleItems = 3;  // Número de itens visíveis no display
+const int maxVisibleItems = 3;
 
-// Função para processar dados do GPS e atualizar a localização do satélite
+// Atualiza dados do GPS e localização do satélite
 void processGPSData() {
     if (gps.date.isUpdated() && gps.time.isUpdated()) {
         struct tm timeinfo;
@@ -69,7 +64,6 @@ void processGPSData() {
         timeinfo.tm_sec = gps.time.second();
         timeinfo.tm_isdst = 0;
 
-        // Atualiza o unixtime global
         unixtime = mktime(&timeinfo);
 
         if (gps.location.isValid() && gps.altitude.isValid()) {
@@ -79,7 +73,6 @@ void processGPSData() {
             sat.site(lat, lon, alt);
         }
 
-        // Atualiza o cálculo da posição do satélite
         sat.findsat(static_cast<unsigned long>(unixtime));
     }
 }
@@ -121,10 +114,10 @@ void displayMenu() {
 // Função para atualizar os dados do satélite a cada segundo
 void Second_Tick() {
 
-    passinfo overpass; // Structure to store overpass info
+    passinfo overpass; 
     sat.initpredpoint(static_cast<unsigned long>(unixtime), 0.0);
 
-    if (currentMenuIndex == 1) {  // Atualiza apenas se estiver na tela de monitoramento
+    if (currentMenuIndex == 1) {  
         invjday(sat.satJd, timezone, true, year, mon, day, hr, minute, sec);
         int error = sat.nextpass(&overpass, 20); // Limit of 20 maximums below horizon
  
@@ -171,7 +164,7 @@ void initSatellite(int index) {
 // Função para gerenciar os botões e o menu
 void handleButtonPresses() {
     if (digitalRead(BUTTON_PIN_NEXT) == LOW) {
-        if (currentMenuIndex == 0) {  // Navega entre os satélites
+        if (currentMenuIndex == 0) { 
             currentSatelliteIndex = (currentSatelliteIndex + 1) % numSatellites;
 
             if (currentSatelliteIndex >= topMenuIndex + maxVisibleItems) {
@@ -182,11 +175,11 @@ void handleButtonPresses() {
             }
             displayMenu();
         }
-        delay(200); // Debounce
+        delay(200);
     }
 
     if (digitalRead(BUTTON_PIN_PREV) == LOW) {
-        if (currentMenuIndex == 0) {  // Navega entre os satélites
+        if (currentMenuIndex == 0) { 
             currentSatelliteIndex = (currentSatelliteIndex - 1 + numSatellites) % numSatellites;
 
             if (currentSatelliteIndex < topMenuIndex) {
@@ -197,18 +190,18 @@ void handleButtonPresses() {
             }
             displayMenu();
         }
-        delay(200); // Debounce
+        delay(200); 
     }
 
     if (digitalRead(BUTTON_PIN_SELECT) == LOW) {
-        if (currentMenuIndex == 0) {  // Seleciona o satélite e inicia o monitoramento
+        if (currentMenuIndex == 0) { 
             initSatellite(currentSatelliteIndex);
-            currentMenuIndex = 1;  // Vai para a tela de monitoramento
-        } else if (currentMenuIndex == 1) {  // Volta para o menu de seleção
+            currentMenuIndex = 1;  
+        } else if (currentMenuIndex == 1) {
             currentMenuIndex = 0;
         }
         displayMenu();
-        delay(200); // Debounce
+        delay(200);
     }
 }
 
@@ -216,7 +209,6 @@ void setup() {
     Serial.begin(115200);
     SerialGPS.begin(9600, SERIAL_8N1, 16, 17);
 
-    // Inicializa o display OLED
     if(!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
         Serial.println(F("Falha na inicialização do display SSD1306"));
         for(;;);
@@ -224,12 +216,10 @@ void setup() {
     display.clearDisplay();
     display.display();
     
-    // Configura os pinos dos botões
     pinMode(BUTTON_PIN_NEXT, INPUT_PULLUP);
     pinMode(BUTTON_PIN_PREV, INPUT_PULLUP);
     pinMode(BUTTON_PIN_SELECT, INPUT_PULLUP);
 
-    // Exibe o menu inicial
     displayMenu();
     
     // Configura o ticker para atualizar os dados do satélite a cada segundo
