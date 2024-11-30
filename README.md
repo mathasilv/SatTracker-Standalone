@@ -108,5 +108,5 @@ You can add or remove satellites by editing the `SatelliteData` structure in the
 
 ## Demo
 
-![First prototype of the project](files/prototype.mp4)
+![Project Demo](assets/demo.gif)
 
