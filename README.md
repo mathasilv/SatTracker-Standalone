@@ -106,6 +106,14 @@ The default list of satellites included in the code is:
 
 You can add or remove satellites by editing the `SatelliteData` structure in the code. Ensure you obtain updated TLE lines for each satellite.
 
+Para adicionar o esquema ao README, você pode incluir o protótipo do esquemático como uma imagem. Aqui está um trecho atualizado com o esquemático:
+
+## Schematic Prototype
+
+Below is the current prototype of the SatTracker circuit, designed to integrate the ESP32, GPS module, OLED display, and other components:
+
+![Schematic Prototype](assets/Schematic_SatTracker_2024-11-29.png)
+
 ## Demo
 
 ![Project Demo](assets/demo.gif)
